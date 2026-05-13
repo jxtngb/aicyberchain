@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Access | CyberShield IDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --secondary: #6610f2;
+            --success: #198754;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --dark: #121826;
+            --darker: #0a0e17;
+            --light: #f8f9fa;
+            --cyber-blue: #00d4ff;
+            --cyber-purple: #8a2be2;
+            --cyber-green: #00ff88;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .cyber-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(13, 110, 253, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(102, 16, 242, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .cyber-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        .login-card {
+            background: rgba(18, 24, 38, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(0, 212, 255, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cyber-blue), var(--cyber-purple));
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo {
+            color: var(--cyber-blue);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-title {
+            color: var(--light);
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .brand-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            color: var(--light);
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--cyber-blue);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+            color: var(--light);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            color: rgba(0, 212, 255, 0.6);
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+            border: none;
+            border-radius: 8px;
+            color: var(--dark);
+            font-weight: 700;
+            padding: 0.75rem;
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .login-btn:hover::after {
+            left: 100%;
+        }
+
+        .message-container {
+            margin-top: 1rem;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b6b;
+            border-left: 4px solid var(--danger);
+        }
+
+        .security-badge {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge-text {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 576px) {
+            .login-card {
+                margin: 1rem;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--cyber-blue);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="particles" id="particles"></div>
+    <div class="cyber-bg"></div>
+    <div class="cyber-grid"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="brand-header">
+                <div class="brand-logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h1 class="brand-title">CyberShield IDS</h1>
+                <p class="brand-subtitle">Intrusion Detection System</p>
+            </div>
+
+            <form id="loginForm">
+                <!-- Step 1: Credentials -->
+                <div id="credentialsStep">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="username" class="form-control" placeholder="Enter your username"
+                            required>
+                        <i class="fas fa-user-circle input-icon"></i>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-key"></i> Password
+                        </label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                            required>
+                        <i class="fas fa-eye input-icon" id="togglePassword" style="cursor: pointer;"></i>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Next
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="/register/" class="text-info text-decoration-none small">
+                            <i class="fas fa-user-plus"></i> Create New Account
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Step 2: OTP -->
+                <div id="otpStep" style="display: none;">
+                    <div class="alert alert-info py-2 mb-3">
+                        <small><i class="fas fa-envelope"></i> OTP sent to your email</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-shield-alt"></i> Enter OTP
+                        </label>
+                        <input type="text" id="otp" class="form-control text-center" placeholder="123456" maxlength="6">
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+
+                    <button type="button" id="verifyOtpBtn" class="login-btn">
+                        <i class="fas fa-check-circle"></i> Verify & Login
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="#" id="backToLogin" class="text-muted text-decoration-none small">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                </div>
+
+                <div class="message-container">
+                    <div id="msg" class="alert" style="display: none;"></div>
+                </div>
+            </form>
+
+            <div class="security-badge">
+                <p class="badge-text">
+                    <i class="fas fa-shield-check"></i>
+                    Protected by AI & Blockchain Security
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${15 + Math.random() * 10}s`;
+                particle.style.background = i % 3 === 0 ? 'var(--cyber-blue)' :
+                    i % 3 === 1 ? 'var(--cyber-purple)' : 'var(--cyber-green)';
+                container.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // Login Logic
+        const csrfToken = '{{ csrf_token }}';
+
+        // Step 1: Verify Credentials
+        $("#loginForm").submit(function (e) {
+            e.preventDefault();
+            const username = $("#username").val();
+            const password = $("#password").val();
+            const btn = $(this).find('button[type="submit"]');
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Sending OTP...');
+            $("#msg").hide();
+
+            $.ajax({
+                url: "",
+                method: "POST",
+                data: {
+                    action: "verify_credentials",
+                    username: username,
+                    password: password,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function (res) {
+                    if (res.status === "success") {
+                        $("#credentialsStep").slideUp();
+                        $("#otpStep").slideDown();
+                        $("#msg").removeClass('alert-danger').addClass('alert-success').text(res.message).slideDown();
+                    } else {
+                        $("#msg").removeClass('alert-success').addClass('alert-danger').text(res.message).slideDown();
+                        btn.prop('disabled', false).html('<i class="fas fa-sign-in-alt"></i> Next');
+                    }
+                },
+                error: function () {
+                    $("#msg").addClass('alert-danger').text("Server Error").slideDown();
+                    btn.prop('disabled', false).html('<i class="fas fa-sign-in-alt"></i> Next');
+                }
+            });
+        });
+
+        // Toggle Password Visibility
+        $("#togglePassword").click(function () {
+            const input = $("#password");
+            const icon = $(this);
+            if (input.attr("type") === "password") {
+                input.attr("type", "text");
+                icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            } else {
+                input.attr("type", "password");
+                icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            }
+        });
+
+        // Step 2: Verify OTP
+        $("#verifyOtpBtn").click(function () {
+            const otp = $("#otp").val();
+            const btn = $(this);
+
+            if (otp.length < 4) {
+                $("#msg").addClass('alert-danger').text("Please enter valid OTP").slideDown();
+                return;
+            }
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Verifying...');
+
+            $.ajax({
+                url: "",
+                method: "POST",
+                data: {
+                    action: "verify_otp",
+                    otp: otp,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function (res) {
+                    if (res.status === "success") {
+                        window.location.href = "/dashboard/";
+                    } else {
+                        $("#msg").removeClass('alert-success').addClass('alert-danger').text(res.message).slideDown();
+                        btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Verify & Login');
+                    }
+                },
+                error: function () {
+                    btn.prop('disabled', false).html('<i class="fas fa-check-circle"></i> Verify & Login');
+                }
+            });
+        });
+
+        // Back button
+        $("#backToLogin").click(function (e) {
+            e.preventDefault();
+            $("#otpStep").slideUp();
+            $("#credentialsStep").slideDown();
+            $("#msg").hide();
+            $("#loginForm").find('button[type="submit"]').prop('disabled', false).html('<i class="fas fa-sign-in-alt"></i> Next');
+        });
+    </script>
+</body>
+
+</html>

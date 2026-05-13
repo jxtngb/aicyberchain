@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Django
+db.sqlite3
+*.log
+media/
+staticfiles/
+
+# Environment files
+.env
+
+# Editor/OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Build and notebook noise
+.ipynb_checkpoints/
+
+# Model artifacts and generated outputs
+*.pkl
+*.pth
+*.pcap
+*.pcapng
+*.png
+
+# Keep documentation images if you add them under docs/
+!docs/
+!docs/**
+
+# Local/generated project files
+code/~$structions.docx
+cybersec_webapp/importtime.log
+cybersec_webapp/contract_address.txt

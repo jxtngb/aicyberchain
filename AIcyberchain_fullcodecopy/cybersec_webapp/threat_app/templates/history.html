@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat History | CyberShield IDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("cybershield-theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --secondary: #6610f2;
+            --success: #00ff88;
+            --danger: #ff4757;
+            --warning: #ffc107;
+            --info: #00d4ff;
+            --dark: #121826;
+            --darker: #0a0e17;
+            --light: #f8f9fa;
+            --cyber-blue: #00d4ff;
+            --cyber-purple: #8a2be2;
+            --cyber-green: #00ff88;
+            --cyber-red: #ff4757;
+        }
+        
+        body {
+            background: var(--darker);
+            color: var(--light);
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .neural-network-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.78;
+        }
+
+        .sidebar,
+        .main-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: rgba(18, 24, 38, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(0, 212, 255, 0.1);
+            min-height: 100vh;
+            position: fixed;
+            width: 260px;
+            z-index: 1000;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            text-align: center;
+        }
+        
+        .logo {
+            color: var(--cyber-blue);
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .brand {
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-menu {
+            padding: 2rem 1rem;
+        }
+        
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .nav-link:hover {
+            color: var(--light);
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .nav-link.active {
+            color: var(--light);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(138, 43, 226, 0.2));
+            border-left: 3px solid var(--cyber-blue);
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header-title h1 {
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--cyber-blue), var(--light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .theme-toggle-btn {
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--light);
+            border-radius: 999px;
+            padding: 0.45rem 0.95rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.25s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: 0 0 12px rgba(0, 212, 255, 0.22);
+        }
+        
+        /* Filters */
+        .filters-card {
+            background: rgba(18, 24, 38, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--cyber-blue);
+            color: var(--light);
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, var(--cyber-green), var(--cyber-blue));
+            border: none;
+            color: var(--dark);
+            font-weight: 700;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.2);
+        }
+        
+        /* Table Container */
+        .table-container {
+            background: rgba(18, 24, 38, 0.8);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            overflow: visible;
+        }
+
+        .table-scroll-wrap {
+            overflow-x: auto;
+            overflow-y: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 212, 255, 0.45) rgba(255, 255, 255, 0.06);
+        }
+
+        .table-scroll-wrap::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .table-scroll-wrap::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+        }
+
+        .table-scroll-wrap::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.6), rgba(138, 43, 226, 0.55));
+            border-radius: 999px;
+        }
+
+        .table-scroll-wrap::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.78), rgba(138, 43, 226, 0.75));
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .table-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Table Styles */
+        .threat-table {
+            width: 100%;
+            min-width: 1240px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .threat-table thead {
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .threat-table th {
+            padding: 1rem;
+            font-weight: 600;
+            color: var(--cyber-blue);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+            text-align: left;
+            position: sticky;
+            top: 0;
+            background: rgba(18, 24, 38, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .threat-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .threat-table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .threat-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateX(2px);
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .status-attack {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--cyber-red);
+        }
+        
+        .status-normal {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--cyber-green);
+        }
+        
+        .status-suspicious {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+
+        .conf-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid transparent;
+        }
+
+        .conf-restricted {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff8f99;
+            border-color: rgba(255, 71, 87, 0.45);
+        }
+
+        .conf-confidential {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffd363;
+            border-color: rgba(255, 193, 7, 0.45);
+        }
+
+        .conf-internal {
+            background: rgba(0, 212, 255, 0.2);
+            color: #7be8ff;
+            border-color: rgba(0, 212, 255, 0.45);
+        }
+
+        .conf-public {
+            background: rgba(0, 255, 136, 0.18);
+            color: #79ffbe;
+            border-color: rgba(0, 255, 136, 0.35);
+        }
+        
+        /* Blockchain Badge */
+        .blockchain-badge {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--cyber-purple);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        /* IP Address */
+        .ip-address {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        /* Pagination */
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .page-item .page-link {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .page-item.active .page-link {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--cyber-blue);
+            color: var(--light);
+        }
+        
+        .page-item .page-link:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--cyber-blue);
+            color: var(--light);
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .brand, .nav-link span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .threat-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+        
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .custom-toast {
+            background: rgba(18, 24, 38, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            color: var(--light);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+        
+        .toast-error {
+            border-left: 4px solid var(--danger);
+        }
+        
+        .toast-info {
+            border-left: 4px solid var(--info);
+        }
+
+        /* Light Theme */
+        html[data-theme="light"] body {
+            background: #f2f6fb;
+            color: #1d2a39;
+        }
+
+        html[data-theme="light"] .neural-network-bg {
+            opacity: 0.6;
+        }
+
+        html[data-theme="light"] .sidebar {
+            background: rgba(252, 255, 255, 0.98);
+            border-right: 1px solid rgba(17, 77, 120, 0.16);
+            box-shadow: 6px 0 18px rgba(20, 35, 55, 0.08);
+        }
+
+        html[data-theme="light"] .nav-link {
+            color: #2a3949;
+        }
+
+        html[data-theme="light"] .nav-link:hover,
+        html[data-theme="light"] .nav-link.active {
+            color: #172535;
+            background: rgba(0, 212, 255, 0.16);
+        }
+
+        html[data-theme="light"] .page-header,
+        html[data-theme="light"] .pagination-container {
+            border-color: rgba(17, 77, 120, 0.16);
+        }
+
+        html[data-theme="light"] .filters-card,
+        html[data-theme="light"] .table-container,
+        html[data-theme="light"] .custom-toast {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(17, 77, 120, 0.16);
+            color: #1d2a39;
+            box-shadow: 0 10px 22px rgba(20, 35, 55, 0.08);
+        }
+
+        html[data-theme="light"] .filter-btn,
+        html[data-theme="light"] .page-item .page-link {
+            background: rgba(0, 0, 0, 0.02);
+            color: #253647;
+            border-color: rgba(17, 77, 120, 0.2);
+        }
+
+        html[data-theme="light"] .table-title,
+        html[data-theme="light"] .text-muted {
+            color: rgba(28, 47, 67, 0.72) !important;
+        }
+
+        html[data-theme="light"] .threat-table th {
+            background: rgba(241, 248, 255, 0.98);
+            color: #0f81b5;
+            border-bottom-color: rgba(17, 77, 120, 0.2);
+        }
+
+        html[data-theme="light"] .threat-table td {
+            color: #1d2a39;
+            border-bottom-color: rgba(17, 77, 120, 0.12);
+        }
+
+        html[data-theme="light"] .threat-table tbody tr:hover {
+            background: rgba(0, 212, 255, 0.12);
+        }
+
+        html[data-theme="light"] .table-scroll-wrap {
+            border-color: rgba(17, 77, 120, 0.18);
+            scrollbar-color: rgba(15, 122, 170, 0.55) rgba(17, 77, 120, 0.1);
+        }
+
+        html[data-theme="light"] .table-scroll-wrap::-webkit-scrollbar-track {
+            background: rgba(17, 77, 120, 0.1);
+        }
+
+        html[data-theme="light"] .table-scroll-wrap::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, rgba(13, 139, 189, 0.72), rgba(86, 63, 172, 0.65));
+        }
+
+        html[data-theme="light"] .table-scroll-wrap::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, rgba(13, 139, 189, 0.9), rgba(86, 63, 172, 0.86));
+        }
+
+        html[data-theme="light"] .status-badge {
+            color: #1d2a39;
+        }
+
+        html[data-theme="light"] .conf-restricted {
+            background: rgba(228, 46, 72, 0.12);
+            color: #b1253c;
+            border-color: rgba(177, 37, 60, 0.35);
+        }
+
+        html[data-theme="light"] .conf-confidential {
+            background: rgba(230, 170, 18, 0.14);
+            color: #8a6410;
+            border-color: rgba(138, 100, 16, 0.35);
+        }
+
+        html[data-theme="light"] .conf-internal {
+            background: rgba(0, 140, 170, 0.12);
+            color: #13637a;
+            border-color: rgba(19, 99, 122, 0.35);
+        }
+
+        html[data-theme="light"] .conf-public {
+            background: rgba(20, 162, 98, 0.12);
+            color: #0f6e43;
+            border-color: rgba(15, 110, 67, 0.35);
+        }
+
+        html[data-theme="light"] .ip-address {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        html[data-theme="light"] .blockchain-badge {
+            color: #5a2a8a;
+            background: rgba(138, 43, 226, 0.12);
+        }
+
+        html[data-theme="light"] .custom-toast {
+            color: #1d2a39;
+        }
+
+        html[data-theme="light"] .theme-toggle-btn {
+            background: rgba(0, 212, 255, 0.14);
+            color: #1d2a39;
+            border-color: rgba(17, 77, 120, 0.25);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="neuralNetworkBg" class="neural-network-bg" aria-hidden="true"></canvas>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="brand">CyberShield IDS</div>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-item">
+                <a href="/dashboard/" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="/history/" class="nav-link active">
+                    <i class="fas fa-history"></i>
+                    <span>Threat History</span>
+                </a>
+            </div>
+           
+            <div class="nav-item mt-4">
+                <a href="/logout/" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-title">
+                <h1>Threat History & Analytics</h1>
+                <p class="text-muted">Complete audit trail of all detected threats</p>
+            </div>
+
+            <div class="header-actions">
+                <button id="themeToggleBtn" type="button" class="theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark</span>
+                </button>
+                <button id="downloadExcel" class="export-btn">
+                    <i class="fas fa-file-export"></i> Export Report
+                </button>
+            </div>
+        </div>
+        
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="fas fa-table"></i>
+                    Threat Detection History
+                </div>
+                <div class="text-muted">
+                    Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ total_records }} records
+                </div>
+            </div>
+            
+            <div class="table-scroll-wrap">
+                <!-- Add ID to the table for Excel export -->
+                <table class="threat-table" id="threatTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Source IP</th>
+                            <th>Destination IP</th>
+                            <th>Protocol</th>
+                            <th>Packet Size</th>
+                            <th>Attack Type</th>                         
+                            <th>Confidence</th>
+                            <th>Model Version</th>
+                            <th>Reason</th>
+                            <th>Confidentiality</th>
+                            <th>Blockchain TX</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in threats %}
+                        <tr>
+                            <td>#{{ page_obj.start_index|add:forloop.counter0 }}</td>
+                            <td>
+                                <div class="fw-bold">{{ t.timestamp|date:"H:i:s" }}</div>
+                                <div class="text-muted small">{{ t.timestamp|date:"M d, Y" }}</div>
+                            </td>
+                            <td>
+                                <span class="ip-address">{{ t.source_ip }}</span>
+                            </td>
+                            <td>
+                                <span class="ip-address">{{ t.destination_ip }}</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-dark">{{ t.protocol }}</span>
+                            </td>
+                            <td>{{ t.packet_size }} bytes</td>
+                            <td>
+                                <span class="status-badge 
+                                    {% if t.attack_type == 'Attack' %}status-attack
+                                    {% else %}status-normal{% endif %}">
+                                    <i class="fas fa-{% if t.attack_type == 'Attack' %}bolt{% else %}check{% endif %}"></i>
+                                    {{ t.attack_type }}
+                                </span>
+                            </td>
+                            <td><span class="status-badge conf-internal">{{ t.ui_confidence|default:"N/A" }}%</span></td>
+                            <td><small class="text-muted">{{ t.ui_model_version|default:"N/A" }}</small></td>
+                            <td><small class="text-muted">{{ t.ui_reason|default:"N/A" }}</small></td>
+                            <td>
+                                {% if t.attack_type == 'Attack' %}
+                                <span class="conf-badge conf-restricted"><i class="fas fa-lock"></i>Restricted</span>
+                                {% elif 'Review' in t.attack_type %}
+                                <span class="conf-badge conf-confidential"><i class="fas fa-user-shield"></i>Confidential</span>
+                                {% elif 'Suspicious' in t.attack_type %}
+                                <span class="conf-badge conf-internal"><i class="fas fa-building-shield"></i>Internal</span>
+                                {% else %}
+                                <span class="conf-badge conf-public"><i class="fas fa-check-circle"></i>Public</span>
+                                {% endif %}
+                            </td>
+                           
+                            <td>
+                                {% if t.blockchain_tx %}
+                                <span class="blockchain-badge" title="{{ t.blockchain_tx }}">
+                                    <i class="fas fa-link"></i>
+                                    {{ t.blockchain_tx|truncatechars:16 }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">None</span>
+                                {% endif %}
+                            </td>
+                          
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="12" class="text-center py-5">
+                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                <h4>No Threats Detected</h4>
+                                <p class="text-muted">Your network is secure. No threats have been detected.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination-container">
+                <div class="text-muted">
+                    Last updated: <span id="currentTime"></span>
+                </div>
+                
+                <nav aria-label="Threat history pagination">
+                    <ul class="pagination">
+                        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+
+                        {% for num in paginator.page_range %}
+                        {% if num == page_obj.number %}
+                        <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% elif num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+
+                        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+                            <a class="page-link" href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let neuralAnimId = null;
+        let neuralNodes = [];
+
+        function initNeuralBackground() {
+            const canvas = document.getElementById("neuralNetworkBg");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            function resizeNeuralCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = Math.floor(window.innerWidth * dpr);
+                canvas.height = Math.floor(window.innerHeight * dpr);
+                canvas.style.width = `${window.innerWidth}px`;
+                canvas.style.height = `${window.innerHeight}px`;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const nodeCount = Math.max(24, Math.min(88, Math.floor(window.innerWidth / 28)));
+                neuralNodes = Array.from({ length: nodeCount }, () => ({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    vx: (Math.random() - 0.5) * 0.32,
+                    vy: (Math.random() - 0.5) * 0.32,
+                }));
+            }
+
+            function drawFrame() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const isLight = (document.documentElement.getAttribute("data-theme") || "dark") === "light";
+                const nodeColor = isLight ? "rgba(17, 102, 145, 0.62)" : "rgba(0, 212, 255, 0.72)";
+                const lineBase = isLight ? "17, 123, 168" : "0, 212, 255";
+                const linkDistance = isLight ? 146 : 166;
+
+                ctx.clearRect(0, 0, w, h);
+
+                for (let i = 0; i < neuralNodes.length; i++) {
+                    const a = neuralNodes[i];
+                    a.x += a.vx;
+                    a.y += a.vy;
+
+                    if (a.x < 0 || a.x > w) a.vx *= -1;
+                    if (a.y < 0 || a.y > h) a.vy *= -1;
+
+                    for (let j = i + 1; j < neuralNodes.length; j++) {
+                        const b = neuralNodes[j];
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < linkDistance) {
+                            const alpha = (1 - dist / linkDistance) * (isLight ? 0.22 : 0.32);
+                            ctx.strokeStyle = `rgba(${lineBase}, ${alpha})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.fillStyle = nodeColor;
+                    ctx.beginPath();
+                    ctx.arc(a.x, a.y, isLight ? 1.6 : 1.85, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                neuralAnimId = requestAnimationFrame(drawFrame);
+            }
+
+            resizeNeuralCanvas();
+            if (neuralAnimId) cancelAnimationFrame(neuralAnimId);
+            drawFrame();
+            window.addEventListener("resize", resizeNeuralCanvas);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("cybershield-theme", theme);
+
+            const btn = document.getElementById("themeToggleBtn");
+            if (!btn) return;
+
+            const icon = btn.querySelector("i");
+            const label = btn.querySelector("span");
+            if (theme === "light") {
+                icon.className = "fas fa-sun";
+                label.textContent = "Light";
+            } else {
+                icon.className = "fas fa-moon";
+                label.textContent = "Dark";
+            }
+        }
+
+        (function initThemeToggle() {
+            const active = document.documentElement.getAttribute("data-theme") || "dark";
+            applyTheme(active);
+            const btn = document.getElementById("themeToggleBtn");
+            if (btn) {
+                btn.addEventListener("click", function () {
+                    const current = document.documentElement.getAttribute("data-theme") || "dark";
+                    applyTheme(current === "dark" ? "light" : "dark");
+                });
+            }
+        })();
+
+        document.addEventListener("DOMContentLoaded", initNeuralBackground);
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const dateString = now.toLocaleDateString();
+            document.getElementById('currentTime').textContent = timeString + ' ' + dateString;
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+        
+        // Export to Excel - FIXED VERSION
+        $("#downloadExcel").click(function(){
+            const btn = $(this);
+            const originalText = btn.html();
+            
+            // Show loading state
+            btn.html('<i class="fas fa-spinner fa-spin"></i> Generating...');
+            btn.prop('disabled', true);
+            
+            try {
+                // Get the table element
+                const table = document.getElementById('threatTable');
+                
+                if (!table) {
+                    throw new Error("Table not found. Please make sure the table has ID 'threatTable'");
+                }
+                
+                // Create a workbook from the table
+                const ws = XLSX.utils.table_to_sheet(table);
+                
+                // Create a new workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Add the worksheet to the workbook
+                XLSX.utils.book_append_sheet(wb, ws, "ThreatHistory");
+                
+                // Generate filename with current date
+                const currentDate = new Date();
+                const dateString = currentDate.toISOString().split('T')[0];
+                const timeString = currentDate.getHours().toString().padStart(2, '0') + 
+                                  currentDate.getMinutes().toString().padStart(2, '0');
+                const fileName = `CyberShield_ThreatHistory_${dateString}_${timeString}.xlsx`;
+                
+                // Save the file
+                XLSX.writeFile(wb, fileName);
+                
+                // Show success toast
+                showToast('Report exported successfully as ' + fileName, 'success');
+                
+            } catch (error) {
+                console.error('Excel export error:', error);
+                
+                // Show error toast
+                showToast('Error exporting report: ' + error.message, 'error');
+            } finally {
+                // Restore button state
+                setTimeout(() => {
+                    btn.html(originalText);
+                    btn.prop('disabled', false);
+                }, 1000);
+            }
+        });
+        
+        // Alternative export function with custom formatting
+        function exportTableToExcel() {
+            const table = document.getElementById('threatTable');
+            if (!table) {
+                showToast('Table not found!', 'error');
+                return;
+            }
+            
+            // Clone the table to avoid modifying the original
+            const clonedTable = table.cloneNode(true);
+            
+            // Remove icons and badges for cleaner Excel output
+            $(clonedTable).find('i').remove();
+            $(clonedTable).find('.badge, .status-badge, .blockchain-badge').each(function() {
+                $(this).replaceWith($(this).text());
+            });
+            
+            // Remove IP address styling
+            $(clonedTable).find('.ip-address').each(function() {
+                $(this).replaceWith($(this).text());
+            });
+            
+            // Create worksheet
+            const ws = XLSX.utils.table_to_sheet(clonedTable);
+            
+            // Auto-size columns
+            const wscols = [];
+            const maxCols = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).e.c + 1 : 0;
+            
+            for (let i = 0; i < maxCols; i++) {
+                wscols.push({ wch: 20 }); // Set column width
+            }
+            ws['!cols'] = wscols;
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Threat History");
+            
+            // Add metadata
+            wb.Props = {
+                Title: "CyberShield Threat History Report",
+                Subject: "Network Threat Detection Logs",
+                Author: "CyberShield IDS",
+                CreatedDate: new Date()
+            };
+            
+            // Generate filename
+            const date = new Date();
+            const filename = `Threat_History_${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}.xlsx`;
+            
+            // Export file
+            XLSX.writeFile(wb, filename);
+            
+            showToast('Report exported successfully!', 'success');
+        }
+        
+        // Filter functionality
+        $(".filter-btn").click(function(){
+            $(".filter-btn").removeClass('active');
+            $(this).addClass('active');
+            
+            // In a real app, this would filter the table data
+            showToast('Filter applied: ' + $(this).text(), 'info');
+        });
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            // Remove existing toasts
+            $('.custom-toast').remove();
+            
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `custom-toast toast-${type}`;
+            
+            // Set icon based on type
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon} fa-lg" style="color: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--info)'}"></i>
+                <div>
+                    <div class="fw-bold">${type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Info'}</div>
+                    <div>${message}</div>
+                </div>
+                <button class="btn-close" style="color: var(--light); margin-left: auto;" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add to container
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+        
+        // Demo data function (for testing without Django backend)
+        function loadDemoData() {
+            const demoData = [
+                {
+                    id: "0001",
+                    timestamp: "14:23:45",
+                    date: "Mar 15, 2024",
+                    source_ip: "192.168.1.100",
+                    destination_ip: "10.0.0.1",
+                    protocol: "TCP",
+                    packet_size: "1456",
+                    attack_type: "Normal",
+                    blockchain_tx: "0x1234abcd"
+                },
+                {
+                    id: "0002",
+                    timestamp: "14:24:10",
+                    date: "Mar 15, 2024",
+                    source_ip: "203.0.113.5",
+                    destination_ip: "192.168.1.100",
+                    protocol: "UDP",
+                    packet_size: "512",
+                    attack_type: "Attack",
+                    blockchain_tx: "0x5678efgh"
+                },
+                {
+                    id: "0003",
+                    timestamp: "14:25:30",
+                    date: "Mar 15, 2024",
+                    source_ip: "192.168.1.101",
+                    destination_ip: "8.8.8.8",
+                    protocol: "ICMP",
+                    packet_size: "84",
+                    attack_type: "Normal",
+                    blockchain_tx: null
+                }
+            ];
+            
+            // This is just for demo purposes - in your actual app, data comes from Django
+            console.log('Demo data loaded:', demoData);
+        }
+        
+        // Initialize on page load
+        $(document).ready(function() {
+            updateTime();
+            loadDemoData();
+            
+            // You can uncomment this to test Excel export on page load
+            // setTimeout(() => {
+            //     $("#downloadExcel").click();
+            // }, 1000);
+        });
+    </script>
+</body>
+</html>

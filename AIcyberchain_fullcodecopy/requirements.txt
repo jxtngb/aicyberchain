@@ -1,0 +1,11 @@
+django>=4.2,<5.0
+pandas
+numpy
+scikit-learn
+joblib
+requests
+scapy
+pyshark
+web3
+py-solc-x
+torch

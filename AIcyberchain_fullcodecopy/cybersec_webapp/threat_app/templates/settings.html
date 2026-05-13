@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | CyberShield IDS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem("cybershield-theme") || "dark";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+        })();
+    </script>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --secondary: #6610f2;
+            --dark: #121826;
+            --darker: #0a0e17;
+            --light: #f8f9fa;
+            --cyber-blue: #00d4ff;
+            --cyber-purple: #8a2be2;
+        }
+
+        body {
+            background: var(--darker);
+            color: var(--light);
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .neural-network-bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.78;
+        }
+
+        .navbar,
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .navbar {
+            background: rgba(18, 24, 38, 0.9);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--cyber-blue) !important;
+        }
+
+        .settings-card {
+            background: rgba(18, 24, 38, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            color: var(--light);
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--cyber-blue);
+            color: var(--light);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, var(--cyber-blue), var(--cyber-purple));
+            border: none;
+            color: var(--dark);
+            font-weight: 700;
+        }
+
+        .alert {
+            display: none;
+        }
+
+        .theme-toggle-btn {
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--light);
+            border-radius: 999px;
+            padding: 0.45rem 0.95rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            transition: all 0.25s ease;
+            margin-right: 0.5rem;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        html[data-theme="light"] body {
+            background: #f2f6fb;
+            color: #1e2b3a;
+        }
+
+        html[data-theme="light"] .neural-network-bg {
+            opacity: 0.6;
+        }
+
+        html[data-theme="light"] .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid rgba(16, 97, 155, 0.2);
+        }
+
+        html[data-theme="light"] .navbar-brand {
+            color: #0f86ba !important;
+        }
+
+        html[data-theme="light"] .settings-card {
+            background: rgba(255, 255, 255, 0.92);
+            border-color: rgba(16, 97, 155, 0.16);
+            box-shadow: 0 12px 24px rgba(10, 33, 52, 0.08);
+        }
+
+        html[data-theme="light"] .form-label,
+        html[data-theme="light"] h3,
+        html[data-theme="light"] .btn-outline-info,
+        html[data-theme="light"] .btn-outline-danger {
+            color: #1e2b3a;
+        }
+
+        html[data-theme="light"] .form-control {
+            background: rgba(248, 252, 255, 0.95);
+            border-color: rgba(16, 97, 155, 0.2);
+            color: #1e2b3a;
+        }
+
+        html[data-theme="light"] .form-control:focus {
+            background: #ffffff;
+            color: #1e2b3a;
+        }
+
+        html[data-theme="light"] .theme-toggle-btn {
+            background: rgba(0, 212, 255, 0.14);
+            color: #1e2b3a;
+            border-color: rgba(16, 97, 155, 0.25);
+        }
+
+        html[data-theme="light"] .navbar .btn-outline-info {
+            color: #0d7aa9;
+            border-color: #0d7aa9;
+        }
+
+        html[data-theme="light"] .navbar .btn-outline-danger {
+            color: #c7445d;
+            border-color: #c7445d;
+        }
+
+        html[data-theme="light"] #toggleSettingsPassword {
+            color: rgba(14, 114, 160, 0.75) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="neuralNetworkBg" class="neural-network-bg" aria-hidden="true"></canvas>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard/"><i class="fas fa-shield-alt me-2"></i>CyberShield IDS</a>
+            <div class="d-flex">
+                <button id="themeToggleBtn" type="button" class="theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                    <span>Dark</span>
+                </button>
+                <a href="/dashboard/" class="btn btn-outline-info me-2"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="/logout/" class="btn btn-outline-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="settings-card">
+                    <h3 class="mb-4 text-center"><i class="fas fa-cog me-2"></i>Account Settings</h3>
+
+                    <div id="msg" class="alert alert-success"></div>
+
+                    <form id="settingsForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ request.user.username }}">
+                        </div>
+
+                        <div class="mb-3" style="position: relative;">
+                            <label class="form-label">New Password</label>
+                            <input type="password" class="form-control" name="password" id="settingsPassword"
+                                placeholder="Leave empty to keep current password">
+                            <i class="fas fa-eye" id="toggleSettingsPassword"
+                                style="position: absolute; right: 15px; top: 38px; cursor: pointer; color: rgba(0, 212, 255, 0.6);"></i>
+                        </div>
+
+                        <button type="submit" class="btn btn-update w-100 mt-3">
+                            <i class="fas fa-save me-2"></i>Update Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script>
+        let neuralAnimId = null;
+        let neuralNodes = [];
+
+        function initNeuralBackground() {
+            const canvas = document.getElementById("neuralNetworkBg");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return;
+
+            function resizeNeuralCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = Math.floor(window.innerWidth * dpr);
+                canvas.height = Math.floor(window.innerHeight * dpr);
+                canvas.style.width = `${window.innerWidth}px`;
+                canvas.style.height = `${window.innerHeight}px`;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                const nodeCount = Math.max(24, Math.min(88, Math.floor(window.innerWidth / 28)));
+                neuralNodes = Array.from({ length: nodeCount }, () => ({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    vx: (Math.random() - 0.5) * 0.32,
+                    vy: (Math.random() - 0.5) * 0.32,
+                }));
+            }
+
+            function drawFrame() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                const isLight = (document.documentElement.getAttribute("data-theme") || "dark") === "light";
+                const nodeColor = isLight ? "rgba(17, 102, 145, 0.62)" : "rgba(0, 212, 255, 0.72)";
+                const lineBase = isLight ? "17, 123, 168" : "0, 212, 255";
+                const linkDistance = isLight ? 146 : 166;
+
+                ctx.clearRect(0, 0, w, h);
+
+                for (let i = 0; i < neuralNodes.length; i++) {
+                    const a = neuralNodes[i];
+                    a.x += a.vx;
+                    a.y += a.vy;
+
+                    if (a.x < 0 || a.x > w) a.vx *= -1;
+                    if (a.y < 0 || a.y > h) a.vy *= -1;
+
+                    for (let j = i + 1; j < neuralNodes.length; j++) {
+                        const b = neuralNodes[j];
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < linkDistance) {
+                            const alpha = (1 - dist / linkDistance) * (isLight ? 0.22 : 0.32);
+                            ctx.strokeStyle = `rgba(${lineBase}, ${alpha})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    ctx.fillStyle = nodeColor;
+                    ctx.beginPath();
+                    ctx.arc(a.x, a.y, isLight ? 1.6 : 1.85, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                neuralAnimId = requestAnimationFrame(drawFrame);
+            }
+
+            resizeNeuralCanvas();
+            if (neuralAnimId) cancelAnimationFrame(neuralAnimId);
+            drawFrame();
+            window.addEventListener("resize", resizeNeuralCanvas);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("cybershield-theme", theme);
+
+            const btn = document.getElementById("themeToggleBtn");
+            if (!btn) return;
+            const icon = btn.querySelector("i");
+            const label = btn.querySelector("span");
+            if (theme === "light") {
+                icon.className = "fas fa-sun";
+                label.textContent = "Light";
+            } else {
+                icon.className = "fas fa-moon";
+                label.textContent = "Dark";
+            }
+        }
+
+        (function initThemeToggle() {
+            const active = document.documentElement.getAttribute("data-theme") || "dark";
+            applyTheme(active);
+            const btn = document.getElementById("themeToggleBtn");
+            if (btn) {
+                btn.addEventListener("click", function () {
+                    const current = document.documentElement.getAttribute("data-theme") || "dark";
+                    applyTheme(current === "dark" ? "light" : "dark");
+                });
+            }
+        })();
+
+        document.addEventListener("DOMContentLoaded", initNeuralBackground);
+
+        // Toggle Password
+        $("#toggleSettingsPassword").click(function () {
+            const input = $("#settingsPassword");
+            const icon = $(this);
+            if (input.attr("type") === "password") {
+                input.attr("type", "text");
+                icon.removeClass("fa-eye").addClass("fa-eye-slash");
+            } else {
+                input.attr("type", "password");
+                icon.removeClass("fa-eye-slash").addClass("fa-eye");
+            }
+        });
+
+        $("#settingsForm").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: $(this).serialize(),
+                success: function (res) {
+                    if (res.status === "success") {
+                        $("#msg").removeClass('alert-danger').addClass('alert-success').text(res.message).slideDown();
+                    } else {
+                        $("#msg").removeClass('alert-success').addClass('alert-danger').text(res.message).slideDown();
+                    }
+                },
+                error: function () {
+                    $("#msg").addClass('alert-danger').text("Server Error").slideDown();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

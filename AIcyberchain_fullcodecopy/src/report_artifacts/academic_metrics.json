@@ -1,0 +1,33 @@
+{
+  "dataset": "D:\\firsttry\\final1 - Copy\\AIcyberchain_fullcodecopy\\src\\training_data_binary.csv",
+  "label_column": "label",
+  "split": {
+    "train": 539,
+    "validation": 180,
+    "test": 180
+  },
+  "feature_count": 9,
+  "autoencoder_numeric_feature_count": 9,
+  "random_forest_test_metrics": {
+    "accuracy": 0.9055555555555556,
+    "precision": 0.9368421052631579,
+    "recall": 0.89,
+    "f1_score": 0.9128205128205128,
+    "roc_auc": 0.9717499999999999
+  },
+  "autoencoder_test_metrics": {
+    "accuracy": 0.6166666666666667,
+    "precision": 1.0,
+    "recall": 0.31,
+    "f1_score": 0.4732824427480916,
+    "roc_auc": 0.9352499999999999
+  },
+  "autoencoder_threshold": 0.5966172218322754,
+  "notes": [
+    "Metrics are reported on a held-out test split.",
+    "The autoencoder-style reconstruction model is trained on normal training samples only.",
+    "Threshold is tuned on validation data instead of using mean+std directly.",
+    "Engineered features extend beyond protocol and packet_size when relevant columns exist.",
+    "This script improves academic evaluation and does not modify the deployed web runtime model."
+  ]
+}
