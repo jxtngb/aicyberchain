@@ -1,6 +1,6 @@
 # AICyberChain
 
-AICyberChain is a Django-based cyber threat monitoring project that combines traffic analysis, machine learning, live monitoring, IP blocking, and optional blockchain logging for security events.
+AICyberChain is a Django-based cyber threat monitoring project that combines traffic analysis, machine learning, live monitoring, IP blocking, threat logging and optional blockchain logging for security events.
 
 ## Features
 
